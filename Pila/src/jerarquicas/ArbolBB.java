@@ -83,11 +83,17 @@ public class ArbolBB {
     }
 
     public boolean eliminar(Comparable elemento) {
-        boolean exito;
-        if (this.raiz.getElem().compareTo(elemento) < 0) {
-            exito = eliminarR(this.raiz.getIzquierdo(), this.raiz, elemento);
+        boolean exito = false;
+        if (!this.esVacio()) {
+
+            if (this.raiz.getElem().compareTo(elemento) > 0) {
+                exito = eliminarR(this.raiz.getIzquierdo(), this.raiz, elemento);
+            } else {
+                exito = eliminarR(this.raiz.getDerecho(), this.raiz, elemento);
+            }
         } else {
-            exito = eliminarR(this.raiz.getDerecho(), this.raiz, elemento);
+            MayorDeMenores(this.raiz.getIzquierdo(), this.raiz);
+
         }
         return exito;
     }
@@ -112,23 +118,54 @@ public class ArbolBB {
                                 padre.setDerecho(n.getIzquierdo());
                             }
                             if (n.getIzquierdo() != null && n.getDerecho() != null) {
-                                MayorDeMenores(n,padre);
+                                MayorDeMenores(n.getIzquierdo(), padre);
+                                
                             }
                         }
+                        else
+                            if (n.getIzquierdo() == null && n.getDerecho() != null) {
+                                padre.setIzquierdo(n.getDerecho());
+                            }
+                            if (n.getIzquierdo() != null && n.getDerecho() == null) {
+                                padre.setIzquierdo(n.getIzquierdo());
+                            }
+                            if (n.getIzquierdo() != null && n.getDerecho() != null) {
+                                MayorDeMenores(n.getIzquierdo(), padre);
+                                
+                            }
                     }
 
                 } else {
                     if (n.getElem().compareTo(elem) > 0) {
-
+                        exito = eliminarR(n.getIzquierdo(), n, elem);
+                    } else {
+                        exito = eliminarR(n.getDerecho(), n, elem);
                     }
                 }
             }
         }
         return exito;
     }
-    private void MayorDeMenores(NodoArbol n,NodoArbol padre){
-        NodoArbol nodo=n.getIzquierdo();
-        if(n.getDerecho()!=null)
+
+    private void MayorDeMenores(NodoArbol n, NodoArbol padre) {
+        //Metodo para buscar el nodo con el elemento mayor entre los menores del subarbol
+        NodoArbol aux;
+        if (n.getDerecho() == null) {
+            
+            padre.getDerecho().setElemen(n.getElem());
+            System.out.println(padre.getDerecho().getElem());
+            aux=padre(n.getElem());
+            if (n.getIzquierdo() == null) {
+                aux.setDerecho(null);
+                
+            } else {
+                aux.setDerecho(n.getIzquierdo());
+            }
+
+        } else {
+
+            MayorDeMenores(n.getDerecho(), padre);
+        }
     }
 
     public ListaComp listar() {
@@ -188,6 +225,48 @@ public class ArbolBB {
         }
         return elem;
 
+    }
+
+    public void preOrden() {
+        if (!this.esVacio()) {
+            preOrdenR(this.raiz);
+        }
+    }
+
+    private void preOrdenR(NodoArbol n) {
+        if (n != null) {
+            System.out.print(n.getElem() + " ");
+            preOrdenR(n.getIzquierdo());
+            preOrdenR(n.getDerecho());
+        }
+    }
+
+    private NodoArbol padre(Comparable elem) {
+        NodoArbol padre = null;
+        if (!this.esVacio() && this.raiz.getElem().compareTo(elem) != 0) {
+            padre = padreR(this.raiz, elem);
+        }
+        return padre;
+    }
+
+    private NodoArbol padreR(NodoArbol n, Comparable elem) {
+        NodoArbol nodo = null;
+        if (n != null) {
+            if (n.getElem().compareTo(elem) == 0) {
+                nodo = n;
+            } else {
+                if (n.getElem().compareTo(elem) < 0) {
+                    nodo = padreR(n.getDerecho(), elem);
+                } else {
+                    nodo = padreR(n.getIzquierdo(), elem);
+                }
+
+            }
+            if (nodo != null && nodo.getElem().equals(elem)) {
+                nodo = n;
+            }
+        }
+        return nodo;
     }
 
 }
