@@ -221,26 +221,43 @@ public class ArbolBB {
     }
 
     private void listarRangoR(NodoArbol n, Comparable elemMin, Comparable elemMax, ListaComp lista) {
-
+        
         if (n != null) {
-            
+            System.out.println(n.getElem());
             if (n.getElem().compareTo(elemMin) >= 0 && n.getElem().compareTo(elemMax) <= 0) {
                 listarRangoR(n.getIzquierdo(), elemMin, elemMax, lista);
-                lista.insertar(n.getElem(), lista.longitud()+1);
+                lista.insertar(n.getElem(), lista.longitud() + 1);
                 listarRangoR(n.getDerecho(), elemMin, elemMax, lista);
             } else {
                 if (n.getElem().compareTo(elemMin) > 0) {
-                    System.out.println("elementos mayores a "+elemMax+" "+n.getElem());
+                    //System.out.println("elementos mayores a " + elemMax + " " + n.getElem());
                     listarRangoR(n.getIzquierdo(), elemMin, elemMax, lista);
                 } else {
-                    System.out.println("elementos menores a "+elemMin+" "+n.getElem());
+                    //System.out.println("elementos menores a " + elemMin + " " + n.getElem());
                     listarRangoR(n.getDerecho(), elemMin, elemMax, lista);
 
                 }
             }
         }
     }
-
+    public void eliminarMinimo(){
+        if(!this.esVacio()){
+            if(this.raiz.getIzquierdo()==null){
+                this.raiz=this.raiz.getDerecho();
+            }
+            else
+                eliminarMinimoR(this.raiz,this.raiz.getIzquierdo());
+        }
+    }
+    private void eliminarMinimoR(NodoArbol p,NodoArbol n){
+        if(n!=null){
+            if(n.getIzquierdo()==null){
+                p.setIzquierdo(n.getDerecho());
+            }
+            else
+                eliminarMinimoR(n,n.getIzquierdo());
+        }
+    }
     public Comparable minimoElem() {
         Comparable elem = null;
         if (this.raiz != null) {

@@ -36,7 +36,7 @@ public class ArbolGen {
     }
 
     private NodoGen obtenerNodo(NodoGen n, Object buscado) {
-        NodoGen resultado = null, h = null;
+        NodoGen resultado = null, h ;
         if (n != null) {
             if (n.getElem().equals(buscado)) {
                 resultado = n;
@@ -202,6 +202,135 @@ public class ArbolGen {
         return max;
     }
 
+   /* public boolean verificarCamino(Lista l1) {
+        boolean exito = false;
+        if (!this.esVacio()) {
+            exito = verificarCaminoR(this.raiz, l1);
+        }
+        return exito;
+    }
+
+    private boolean verificarCaminoR(NodoGen n, Lista l1) {
+        boolean exito = false;
+
+        if (n != null) {
+
+            if (n.getElem().equals(l1.recuperar(1))) {
+                l1.eliminar(1);
+                exito = verificarCaminoR(n.getHijoIzquierdo(), l1);
+            } else {
+                NodoGen hijo = n.getHermanoDerecho();
+                while (hijo != null && !l1.esVacia()) {
+                    exito = verificarCaminoR(hijo, l1);
+                    hijo = hijo.getHermanoDerecho();
+                }
+            }
+
+        }
+        if (l1.esVacia()) {
+            exito = true;
+        }
+        return exito;
+    }*/
+    public boolean verificarCamino(Lista l1) {
+        boolean exito = false;
+        int i=0;
+        if (!this.esVacio()) {
+            exito = verificarCaminoR(this.raiz, l1,i);
+        }
+        return exito;
+    }
+
+    private boolean verificarCaminoR(NodoGen n, Lista l1,int i) {
+        boolean exito = false;
+
+        if (n != null) {
+
+            if (n.getElem().equals(l1.recuperar(i))) {
+                i++;
+                exito = verificarCaminoR(n.getHijoIzquierdo(), l1,i);
+                if(!exito){
+                    i--;
+                    exito = verificarCaminoR(n.getHermanoDerecho(), l1,i);
+                }
+            } else {
+                NodoGen hijo = n.getHermanoDerecho();
+                while (hijo != null && i<=l1.longitud()) {
+                    exito = verificarCaminoR(hijo, l1,i);
+                    hijo = hijo.getHermanoDerecho();
+                }
+            }
+
+        }
+        if (i>l1.longitud()) {
+            exito = true;
+        }
+        return exito;
+    }
+    
+
+    public Lista listarEntreNiveles(int nivel1, int nivel2) {
+        Lista lista = new Lista();
+        int nivel=0;
+        if (!this.esVacio()) {
+            listarEntreNivelesR(this.raiz, nivel1, nivel2, nivel, lista);
+        }
+        return lista;
+    }
+
+    private void listarEntreNivelesR(NodoGen n, int nivel1, int nivel2, int nivel, Lista lista) {
+        
+        if (n != null) {
+            NodoGen hijo = n.getHijoIzquierdo();
+            //System.out.println("Nodos visitado "+n.getElem()+" ");
+            if(nivel<nivel2){
+            listarEntreNivelesR(hijo, nivel1, nivel2, nivel + 1, lista);}
+            
+            if (nivel >= nivel1 && nivel <= nivel2) {
+                lista.insertar(n.getElem(), lista.longitud() + 1);
+            }
+            
+            while (hijo != null&&nivel<nivel2) {
+                //System.out.println("Nodo Hijo "+hijo.getElem());
+                hijo = hijo.getHermanoDerecho();
+                listarEntreNivelesR(hijo, nivel1, nivel2, nivel+1, lista);
+            }
+
+        }
+    }
+    public boolean eliminar(Object elemento){
+        boolean exito=false;
+        if(!this.esVacio()){
+                if(this.raiz.getElem().equals(elemento)){
+                    this.raiz=null;
+                    exito=true;
+                }
+                else
+                    exito=eliminarR(this.raiz.getHijoIzquierdo(),this.raiz,elemento);            
+        }
+        return exito;
+    }
+    private boolean eliminarR(NodoGen n,NodoGen p, Object elem){
+        boolean exito=false;
+        if(n!=null){
+            if(n.getElem().equals(elem)){
+                if(p.getHijoIzquierdo()==n)
+                    p.setHijoIzquierdo(n.getHermanoDerecho());
+                else
+                    p.setHermanoDerecho(n.getHermanoDerecho());
+                exito=true;
+            }
+            else{
+                NodoGen hijo=n.getHijoIzquierdo();                
+                while(hijo!=null&&!exito){
+                    exito=eliminarR(hijo,n,elem);
+                    hijo=n.getHermanoDerecho();
+                }
+            }
+        }
+        return exito;
+    }
+
     public int nivel(Object elemento) {
 
         return nivelRec(this.raiz, elemento);
@@ -233,10 +362,11 @@ public class ArbolGen {
         NodoGen res;
         if (this.raiz != null) {
             res = padreRec(this.raiz, elemento);
-            if(res!=null)
+            if (res != null) {
                 resultado = res.getElem();
+            }
         }
-        return resultado;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+        return resultado;
     }
 
     private NodoGen padreRec(NodoGen n, Object elem) {
