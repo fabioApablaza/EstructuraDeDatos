@@ -36,7 +36,7 @@ public class ArbolGen {
     }
 
     private NodoGen obtenerNodo(NodoGen n, Object buscado) {
-        NodoGen resultado = null, h ;
+        NodoGen resultado = null, h;
         if (n != null) {
             if (n.getElem().equals(buscado)) {
                 resultado = n;
@@ -201,8 +201,8 @@ public class ArbolGen {
 
         return max;
     }
-
-   /* public boolean verificarCamino(Lista l1) {
+    //SIMULACRO
+    /* public boolean verificarCamino(Lista l1) {
         boolean exito = false;
         if (!this.esVacio()) {
             exito = verificarCaminoR(this.raiz, l1);
@@ -232,46 +232,104 @@ public class ArbolGen {
         }
         return exito;
     }*/
-    public boolean verificarCamino(Lista l1) {
+    public boolean verificarCamino2(Lista l1) {
         boolean exito = false;
-        int i=0;
+        
         if (!this.esVacio()) {
-            exito = verificarCaminoR(this.raiz, l1,i);
+            exito = verificarCaminoR2(this.raiz, l1, 1);
         }
         return exito;
     }
 
-    private boolean verificarCaminoR(NodoGen n, Lista l1,int i) {
+    private boolean verificarCaminoR2(NodoGen n, Lista l1, int i) {
         boolean exito = false;
 
         if (n != null) {
 
             if (n.getElem().equals(l1.recuperar(i))) {
-                i++;
-                exito = verificarCaminoR(n.getHijoIzquierdo(), l1,i);
-                if(!exito){
-                    i--;
-                    exito = verificarCaminoR(n.getHermanoDerecho(), l1,i);
+                if (i == l1.longitud()&&n.getHijoIzquierdo()==null) {
+                    exito=true;
+                } else {
+                    exito = verificarCaminoR(n.getHijoIzquierdo(), l1, i + 1);
+                    if (!exito) {
+                        exito = verificarCaminoR(n.getHermanoDerecho(), l1, i);
+                    }
                 }
+
             } else {
                 NodoGen hijo = n.getHermanoDerecho();
-                while (hijo != null && i<=l1.longitud()) {
-                    exito = verificarCaminoR(hijo, l1,i);
+                while (hijo != null && !exito) {
+                    exito = verificarCaminoR(hijo, l1, i);
                     hijo = hijo.getHermanoDerecho();
                 }
             }
 
         }
-        if (i>l1.longitud()) {
-            exito = true;
+
+        return exito;
+    }
+    public boolean verificarCamino(Lista l1) {
+        boolean exito = false;
+        
+        if (!this.esVacio()) {
+            exito = verificarCaminoR(this.raiz, l1, 1);
         }
         return exito;
     }
-    
 
+    private boolean verificarCaminoR(NodoGen n, Lista l1, int i) {
+        boolean exito = false;
+
+        if (n != null) {
+
+            if (n.getElem().equals(l1.recuperar(i))) {
+                if (i == l1.longitud()) {
+                    exito=true;
+                } else {
+                    exito = verificarCaminoR(n.getHijoIzquierdo(), l1, i + 1);
+                    if (!exito) {
+                        exito = verificarCaminoR(n.getHermanoDerecho(), l1, i);
+                    }
+                }
+
+            } else {
+                NodoGen hijo = n.getHermanoDerecho();
+                while (hijo != null && !exito) {
+                    exito = verificarCaminoR(hijo, l1, i);
+                    hijo = hijo.getHermanoDerecho();
+                }
+            }
+
+        }
+
+        return exito;
+    }
+    
+    public Lista listarHastaNivel(int niv){
+        Lista l1=new Lista();
+        if(!this.esVacio())
+            listarHastaNivelR(0,niv,l1,this.raiz);
+        return l1; 
+    }
+    private void listarHastaNivelR(int nivelA,int nivelMax,Lista l1,NodoGen n){
+        if(n!=null){
+            
+            l1.insertar(n.getElem(), l1.longitud()+1);
+            if(nivelA<nivelMax){
+                NodoGen Hijo=n.getHijoIzquierdo();
+                nivelA++;
+                listarHastaNivelR(nivelA,nivelMax,l1,Hijo);
+                Hijo=Hijo.getHermanoDerecho();
+                while(Hijo!=null){
+                    listarHastaNivelR(nivelA,nivelMax,l1,Hijo);
+                    Hijo=Hijo.getHermanoDerecho();
+                }
+            }
+        }
+    }
     public Lista listarEntreNiveles(int nivel1, int nivel2) {
         Lista lista = new Lista();
-        int nivel=0;
+        int nivel = 0;
         if (!this.esVacio()) {
             listarEntreNivelesR(this.raiz, nivel1, nivel2, nivel, lista);
         }
@@ -279,52 +337,55 @@ public class ArbolGen {
     }
 
     private void listarEntreNivelesR(NodoGen n, int nivel1, int nivel2, int nivel, Lista lista) {
-        
+
         if (n != null) {
             NodoGen hijo = n.getHijoIzquierdo();
-            //System.out.println("Nodos visitado "+n.getElem()+" ");
-            if(nivel<nivel2){
-            listarEntreNivelesR(hijo, nivel1, nivel2, nivel + 1, lista);}
-            
+
+            if (nivel < nivel2) {
+                listarEntreNivelesR(hijo, nivel1, nivel2, nivel + 1, lista);
+            }
+
             if (nivel >= nivel1 && nivel <= nivel2) {
                 lista.insertar(n.getElem(), lista.longitud() + 1);
             }
-            
-            while (hijo != null&&nivel<nivel2) {
-                //System.out.println("Nodo Hijo "+hijo.getElem());
+
+            while (hijo != null && nivel < nivel2) {
+
                 hijo = hijo.getHermanoDerecho();
-                listarEntreNivelesR(hijo, nivel1, nivel2, nivel+1, lista);
+                listarEntreNivelesR(hijo, nivel1, nivel2, nivel + 1, lista);
             }
 
         }
     }
-    public boolean eliminar(Object elemento){
-        boolean exito=false;
-        if(!this.esVacio()){
-                if(this.raiz.getElem().equals(elemento)){
-                    this.raiz=null;
-                    exito=true;
-                }
-                else
-                    exito=eliminarR(this.raiz.getHijoIzquierdo(),this.raiz,elemento);            
+
+    public boolean eliminar(Object elemento) {
+        boolean exito = false;
+        if (!this.esVacio()) {
+            if (this.raiz.getElem().equals(elemento)) {
+                this.raiz = null;
+                exito = true;
+            } else {
+                exito = eliminarR(this.raiz.getHijoIzquierdo(), this.raiz, elemento);
+            }
         }
         return exito;
     }
-    private boolean eliminarR(NodoGen n,NodoGen p, Object elem){
-        boolean exito=false;
-        if(n!=null){
-            if(n.getElem().equals(elem)){
-                if(p.getHijoIzquierdo()==n)
+
+    private boolean eliminarR(NodoGen n, NodoGen p, Object elem) {
+        boolean exito = false;
+        if (n != null) {
+            if (n.getElem().equals(elem)) {
+                if (p.getHijoIzquierdo() == n) {
                     p.setHijoIzquierdo(n.getHermanoDerecho());
-                else
+                } else {
                     p.setHermanoDerecho(n.getHermanoDerecho());
-                exito=true;
-            }
-            else{
-                NodoGen hijo=n.getHijoIzquierdo();                
-                while(hijo!=null&&!exito){
-                    exito=eliminarR(hijo,n,elem);
-                    hijo=n.getHermanoDerecho();
+                }
+                exito = true;
+            } else {
+                NodoGen hijo = n.getHijoIzquierdo();
+                while (hijo != null && !exito) {
+                    exito = eliminarR(hijo, n, elem);
+                    hijo = n.getHermanoDerecho();
                 }
             }
         }

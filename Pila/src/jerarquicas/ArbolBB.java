@@ -86,8 +86,24 @@ public class ArbolBB {
         boolean exito = false;
         if (!this.esVacio()) {
             if (this.raiz.getElem().compareTo(elemento) == 0) {
-                MayorDeMenores(this.raiz.getIzquierdo(), this.raiz, this.raiz);
-                exito = true;
+                if(this.raiz.getDerecho()!=null&&this.raiz.getIzquierdo()!=null){
+                    MayorDeMenores(this.raiz.getIzquierdo(), this.raiz, this.raiz);
+                    exito = true;
+                }
+                else{
+                    if(this.raiz.getDerecho()==null&&this.raiz.getIzquierdo()!=null){
+                        this.raiz=raiz.getIzquierdo();
+                    }else{
+                        if(this.raiz.getDerecho()!=null&&this.raiz.getIzquierdo()==null){
+                            this.raiz=raiz.getDerecho();
+                        }
+                        else{
+                            this.raiz=null;
+                        }
+                    }
+                    
+                }
+                
             } else {
                 if (this.raiz.getElem().compareTo(elemento) > 0) {
                     exito = eliminarR(this.raiz.getIzquierdo(), this.raiz, elemento);
@@ -150,16 +166,14 @@ public class ArbolBB {
     private void MayorDeMenores(NodoArbol n, NodoArbol padreE, NodoArbol padreC) {
         //Metodo para buscar el nodo con el elemento mayor entre los menores del subarbol
         //'n' es el candidato, padreE es el padre del nodo que quiero eliminar, y padreC es el padre del candidato
-        //System.out.println("MAYOR DE MENORES 1");
+        
         if (n.getDerecho() == null) {//Verifico que mi candidato sea el mayor de los menores
             if (padreE == this.raiz) {
                 padreE.setElemen(n.getElem());
             } else {
                 padreE.getDerecho().setElemen(n.getElem());//modifico el elemento que quiero eliminar por mi candidato
-            }            //System.out.pntln("El candidato es "+n.getElem());            
-            //S/System.out.println("Este es el padre del que quiero eliminar "+padreE.getElem());
-            //System.out.pntln("El candidato es "+n.getElem());            
-            //System.out.println("Este es el padre de el candidato "+padreC.getElem());ri
+            }                        
+            
             if (padreC == padreE.getDerecho())//Verifico que el padre del candidato no sea el mismo elemento que quiero eliminar
             {
                 padreC.setIzquierdo(n.getIzquierdo());//en este caso el candidato es hijo del elemento que quiero eliminar
@@ -221,18 +235,31 @@ public class ArbolBB {
     }
 
     private void listarRangoR(NodoArbol n, Comparable elemMin, Comparable elemMax, ListaComp lista) {
-        
+
         if (n != null) {
-            System.out.println(n.getElem());
-            if (n.getElem().compareTo(elemMin) >= 0 && n.getElem().compareTo(elemMax) <= 0) {
-                listarRangoR(n.getIzquierdo(), elemMin, elemMax, lista);
-                lista.insertar(n.getElem(), lista.longitud() + 1);
-                listarRangoR(n.getDerecho(), elemMin, elemMax, lista);
+            System.out.println("Nodos visitados " + n.getElem());
+            if (n.getElem().compareTo(elemMin) >= 0 && n.getElem().compareTo(elemMax) <= 0) {//verifica si el nodo esta dentro del rango
+                if(n.getElem().compareTo(elemMin) > 0 && n.getElem().compareTo(elemMax) < 0){//
+                    listarRangoR(n.getIzquierdo(), elemMin, elemMax, lista);
+                    lista.insertar(n.getElem(), lista.longitud()+1);
+                    listarRangoR(n.getDerecho(), elemMin, elemMax, lista);
+                }
+                else{
+                    if(n.getElem().compareTo(elemMin)==0){
+                        lista.insertar(n.getElem(), lista.longitud()+1);
+                        listarRangoR(n.getDerecho(), elemMin, elemMax, lista);
+                    }
+                    else{
+                        listarRangoR(n.getIzquierdo(), elemMin, elemMax, lista);    
+                        lista.insertar(n.getElem(), lista.longitud()+1);                                            
+                    }                        
+                }
             } else {
-                if (n.getElem().compareTo(elemMin) > 0) {
+                if (n.getElem().compareTo(elemMax) > 0) {
                     //System.out.println("elementos mayores a " + elemMax + " " + n.getElem());
                     listarRangoR(n.getIzquierdo(), elemMin, elemMax, lista);
                 } else {
+
                     //System.out.println("elementos menores a " + elemMin + " " + n.getElem());
                     listarRangoR(n.getDerecho(), elemMin, elemMax, lista);
 
@@ -240,24 +267,107 @@ public class ArbolBB {
             }
         }
     }
-    public void eliminarMinimo(){
-        if(!this.esVacio()){
-            if(this.raiz.getIzquierdo()==null){
-                this.raiz=this.raiz.getDerecho();
+
+    //SIMULACRO
+    public void eliminarMinimo() {
+        if (!this.esVacio()) {
+            if (this.raiz.getIzquierdo() == null) {
+                this.raiz = this.raiz.getDerecho();
+            } else {
+                eliminarMinimoR(this.raiz, this.raiz.getIzquierdo());
             }
-            else
-                eliminarMinimoR(this.raiz,this.raiz.getIzquierdo());
         }
     }
-    private void eliminarMinimoR(NodoArbol p,NodoArbol n){
-        if(n!=null){
-            if(n.getIzquierdo()==null){
+
+    private void eliminarMinimoR(NodoArbol p, NodoArbol n) {
+        if (n != null) {
+            if (n.getIzquierdo() == null) {
                 p.setIzquierdo(n.getDerecho());
+            } else {
+                eliminarMinimoR(n, n.getIzquierdo());
             }
-            else
-                eliminarMinimoR(n,n.getIzquierdo());
         }
     }
+
+    public ArbolBB clonarParteInvertida(Comparable elem) {
+        ArbolBB clon = new ArbolBB();
+        NodoArbol nodo = null;
+        if (!this.esVacio()) {
+            nodo = obtenerNodo(this.raiz, elem);
+            if (nodo != null) {
+                clon.raiz = clonarParteInvertidaR(nodo);
+            }
+        }
+        return clon;
+    }
+
+    private NodoArbol obtenerNodo(NodoArbol n, Comparable elem) {
+        NodoArbol res;
+
+        if (n.getElem().compareTo(elem) == 0) {
+            res = n;
+        } else {
+            if (n.getElem().compareTo(elem) > 0) {
+                res = obtenerNodo(n.getIzquierdo(), elem);
+            } else {
+                res = obtenerNodo(n.getDerecho(), elem);
+            }
+        }
+        return res;
+    }
+
+    private NodoArbol clonarParteInvertidaR(NodoArbol n) {
+        NodoArbol nodo = null;
+        if (n != null) {
+            nodo = new NodoArbol(n.getElem(), clonarParteInvertidaR(n.getDerecho()), clonarParteInvertidaR(n.getIzquierdo()));
+        }
+        return nodo;
+    }
+
+    public ListaComp listarMayorIgual(Comparable elem) {
+        ListaComp l1 = new ListaComp();
+        NodoArbol nodo;
+        if (!this.esVacio()) {
+            nodo = obtenerNodo(this.raiz, elem);
+            if (nodo != null) {
+                listarMayorIgualR(nodo.getDerecho(), l1);
+                l1.insertar(nodo.getElem(), l1.longitud() + 1);
+            }
+        }
+        return l1;
+    }
+
+    private void listarMayorIgualR(NodoArbol n, ListaComp l1) {
+        if (n != null) {
+            //System.out.println(n.getElem());
+            listarMayorIgualR(n.getDerecho(), l1);
+            l1.insertar(n.getElem(), l1.longitud() + 1);
+            listarMayorIgualR(n.getIzquierdo(), l1);
+        }
+    }
+
+    public ListaComp listarMenores(Comparable elem) {
+        ListaComp l1 = new ListaComp();
+        NodoArbol nodo;
+        if (!this.esVacio()) {
+            nodo = obtenerNodo(this.raiz, elem);
+            if (nodo != null) {
+                listarMenoresR(nodo.getIzquierdo(), l1);
+            }
+        }
+        return l1;
+    }
+
+    private void listarMenoresR(NodoArbol n, ListaComp l1) {
+        if (n != null) {
+
+            listarMenoresR(n.getIzquierdo(), l1);
+            l1.insertar(n.getElem(), l1.longitud() + 1);
+            listarMenoresR(n.getDerecho(), l1);
+        }
+    }
+
+    //FIN DEL SIMULACRO
     public Comparable minimoElem() {
         Comparable elem = null;
         if (this.raiz != null) {
