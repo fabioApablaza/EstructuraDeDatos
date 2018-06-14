@@ -86,24 +86,22 @@ public class ArbolBB {
         boolean exito = false;
         if (!this.esVacio()) {
             if (this.raiz.getElem().compareTo(elemento) == 0) {
-                if(this.raiz.getDerecho()!=null&&this.raiz.getIzquierdo()!=null){
+                if (this.raiz.getDerecho() != null && this.raiz.getIzquierdo() != null) {
                     MayorDeMenores(this.raiz.getIzquierdo(), this.raiz, this.raiz);
                     exito = true;
-                }
-                else{
-                    if(this.raiz.getDerecho()==null&&this.raiz.getIzquierdo()!=null){
-                        this.raiz=raiz.getIzquierdo();
-                    }else{
-                        if(this.raiz.getDerecho()!=null&&this.raiz.getIzquierdo()==null){
-                            this.raiz=raiz.getDerecho();
-                        }
-                        else{
-                            this.raiz=null;
+                } else {
+                    if (this.raiz.getDerecho() == null && this.raiz.getIzquierdo() != null) {
+                        this.raiz = raiz.getIzquierdo();
+                    } else {
+                        if (this.raiz.getDerecho() != null && this.raiz.getIzquierdo() == null) {
+                            this.raiz = raiz.getDerecho();
+                        } else {
+                            this.raiz = null;
                         }
                     }
-                    
+
                 }
-                
+
             } else {
                 if (this.raiz.getElem().compareTo(elemento) > 0) {
                     exito = eliminarR(this.raiz.getIzquierdo(), this.raiz, elemento);
@@ -166,14 +164,14 @@ public class ArbolBB {
     private void MayorDeMenores(NodoArbol n, NodoArbol padreE, NodoArbol padreC) {
         //Metodo para buscar el nodo con el elemento mayor entre los menores del subarbol
         //'n' es el candidato, padreE es el padre del nodo que quiero eliminar, y padreC es el padre del candidato
-        
+
         if (n.getDerecho() == null) {//Verifico que mi candidato sea el mayor de los menores
             if (padreE == this.raiz) {
                 padreE.setElemen(n.getElem());
             } else {
                 padreE.getDerecho().setElemen(n.getElem());//modifico el elemento que quiero eliminar por mi candidato
-            }                        
-            
+            }
+
             if (padreC == padreE.getDerecho())//Verifico que el padre del candidato no sea el mismo elemento que quiero eliminar
             {
                 padreC.setIzquierdo(n.getIzquierdo());//en este caso el candidato es hijo del elemento que quiero eliminar
@@ -226,6 +224,31 @@ public class ArbolBB {
 
     }
 
+    public ListaComp listarRango2(Comparable elemMinimo, Comparable elemMaximo) {
+        ListaComp lista = new ListaComp();
+        if (!this.esVacio()) {
+            listarRangoR2(this.raiz, elemMinimo, elemMaximo, lista);
+        }
+        return lista;
+    }
+
+    private void listarRangoR2(NodoArbol n, Comparable elemMin, Comparable elemMax, ListaComp lista) {
+        //Mejorado
+        if (n != null) {
+            System.out.println("Nodos visitados " + n.getElem());
+            if (n.getElem().compareTo(elemMax) < 0) {
+                listarRangoR2(n.getDerecho(), elemMin, elemMax, lista);
+            }
+            if (n.getElem().compareTo(elemMin) >= 0 && n.getElem().compareTo(elemMax) <= 0) {
+                lista.insertar(n.getElem(), 1);
+            }
+
+            if (n.getElem().compareTo(elemMin) > 0) {
+                listarRangoR2(n.getIzquierdo(), elemMin, elemMax, lista);
+            }
+        }
+    }
+
     public ListaComp listarRango(Comparable elemMinimo, Comparable elemMaximo) {
         ListaComp lista = new ListaComp();
         if (!this.esVacio()) {
@@ -239,20 +262,18 @@ public class ArbolBB {
         if (n != null) {
             System.out.println("Nodos visitados " + n.getElem());
             if (n.getElem().compareTo(elemMin) >= 0 && n.getElem().compareTo(elemMax) <= 0) {//verifica si el nodo esta dentro del rango
-                if(n.getElem().compareTo(elemMin) > 0 && n.getElem().compareTo(elemMax) < 0){//
+                if (n.getElem().compareTo(elemMin) > 0 && n.getElem().compareTo(elemMax) < 0) {//
                     listarRangoR(n.getIzquierdo(), elemMin, elemMax, lista);
-                    lista.insertar(n.getElem(), lista.longitud()+1);
+                    lista.insertar(n.getElem(), lista.longitud() + 1);
                     listarRangoR(n.getDerecho(), elemMin, elemMax, lista);
-                }
-                else{
-                    if(n.getElem().compareTo(elemMin)==0){
-                        lista.insertar(n.getElem(), lista.longitud()+1);
+                } else {
+                    if (n.getElem().compareTo(elemMin) == 0) {
+                        lista.insertar(n.getElem(), lista.longitud() + 1);
                         listarRangoR(n.getDerecho(), elemMin, elemMax, lista);
+                    } else {
+                        listarRangoR(n.getIzquierdo(), elemMin, elemMax, lista);
+                        lista.insertar(n.getElem(), lista.longitud() + 1);
                     }
-                    else{
-                        listarRangoR(n.getIzquierdo(), elemMin, elemMax, lista);    
-                        lista.insertar(n.getElem(), lista.longitud()+1);                                            
-                    }                        
                 }
             } else {
                 if (n.getElem().compareTo(elemMax) > 0) {
@@ -326,48 +347,57 @@ public class ArbolBB {
 
     public ListaComp listarMayorIgual(Comparable elem) {
         ListaComp l1 = new ListaComp();
-        NodoArbol nodo;
+
         if (!this.esVacio()) {
-            nodo = obtenerNodo(this.raiz, elem);
-            if (nodo != null) {
-                listarMayorIgualR(nodo.getDerecho(), l1);
-                l1.insertar(nodo.getElem(), l1.longitud() + 1);
-            }
+            listarMayorIgualR(this.raiz, l1, elem);
+
         }
         return l1;
     }
 
-    private void listarMayorIgualR(NodoArbol n, ListaComp l1) {
+    private void listarMayorIgualR(NodoArbol n, ListaComp l1, Comparable elem) {
         if (n != null) {
-            //System.out.println(n.getElem());
-            listarMayorIgualR(n.getDerecho(), l1);
-            l1.insertar(n.getElem(), l1.longitud() + 1);
-            listarMayorIgualR(n.getIzquierdo(), l1);
+            System.out.println(n.getElem());
+            if (n.getElem().compareTo(elem) > 0) {
+                listarMayorIgualR(n.getDerecho(), l1, elem);
+                l1.insertar(n.getElem(), l1.longitud() + 1);
+                listarMayorIgualR(n.getIzquierdo(), l1, elem);
+
+            } else {
+                listarMayorIgualR(n.getDerecho(), l1, elem);
+            }
+            if (n.getElem().compareTo(elem) == 0) {
+                l1.insertar(n.getElem(), l1.longitud() + 1);
+            }
         }
     }
 
     public ListaComp listarMenores(Comparable elem) {
         ListaComp l1 = new ListaComp();
-        NodoArbol nodo;
+
         if (!this.esVacio()) {
-            nodo = obtenerNodo(this.raiz, elem);
-            if (nodo != null) {
-                listarMenoresR(nodo.getIzquierdo(), l1);
-            }
+            listarMenoresR(this.raiz, l1, elem);
+
         }
         return l1;
     }
 
-    private void listarMenoresR(NodoArbol n, ListaComp l1) {
+    private void listarMenoresR(NodoArbol n, ListaComp l1, Comparable elem) {
         if (n != null) {
+            System.out.println(n.getElem());
+            if (n.getElem().compareTo(elem) < 0) {
 
-            listarMenoresR(n.getIzquierdo(), l1);
-            l1.insertar(n.getElem(), l1.longitud() + 1);
-            listarMenoresR(n.getDerecho(), l1);
+                listarMenoresR(n.getIzquierdo(), l1, elem);
+                l1.insertar(n.getElem(), l1.longitud() + 1);
+                listarMenoresR(n.getDerecho(), l1, elem);
+            } else {
+                listarMenoresR(n.getIzquierdo(), l1, elem);
+            }
         }
+
     }
 
-    //FIN DEL SIMULACRO
+//FIN DEL SIMULACRO
     public Comparable minimoElem() {
         Comparable elem = null;
         if (this.raiz != null) {

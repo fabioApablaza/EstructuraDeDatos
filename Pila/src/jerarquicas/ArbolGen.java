@@ -391,6 +391,27 @@ public class ArbolGen {
         }
         return exito;
     }
+    public Lista frontera(){
+        Lista l1=new Lista();
+        if(this.raiz!=null){
+            fronteraR(this.raiz,l1);
+        }
+        return l1;
+    }
+    private void fronteraR(NodoGen n, Lista l1){
+        if(n!=null){
+            if(n.getHijoIzquierdo()==null)
+                l1.insertar(n.getElem(), l1.longitud()+1);
+            else{
+                NodoGen hijo=n.getHijoIzquierdo();
+                while(hijo!=null){
+                    
+                    fronteraR(hijo,l1);
+                    hijo=hijo.getHermanoDerecho();
+                }
+            }
+        }
+    }
 
     public int nivel(Object elemento) {
 
