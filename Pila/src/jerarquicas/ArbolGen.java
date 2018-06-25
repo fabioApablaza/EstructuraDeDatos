@@ -201,6 +201,66 @@ public class ArbolGen {
 
         return max;
     }
+    public int orden(){
+        int max=0;
+        if(this.raiz!=null)
+            max=ordenR(this.raiz);
+        return max;
+    }
+    private int ordenR(NodoGen n){
+        int max=0,temp=0;
+        if(n!=null){
+            
+            NodoGen hijo=n.getHijoIzquierdo();
+            while(hijo!=null){
+                max++;
+                hijo=hijo.getHermanoDerecho();                
+            }
+            hijo=n.getHijoIzquierdo();
+            while(hijo!=null){
+                temp=ordenR(hijo);
+                if(temp>max)
+                    max=temp;
+                hijo=hijo.getHermanoDerecho();                
+            }
+            
+            
+            
+        }
+        return max;
+    }
+    public int ordenLiam(){
+        int orden;
+        orden=ordenLiamAux(this.raiz,0,0);
+        return orden;
+    }
+    private int ordenLiamAux(NodoGen n,int ordenActual,int ordenMayor){
+        int ordenMax=ordenMayor;
+        int orden=-1;
+        if(n!=null){
+        if(n.getHijoIzquierdo()!=null){
+            ordenActual=ordenActual+1;
+            NodoGen h=n.getHijoIzquierdo().getHermanoDerecho();
+            while(h!=null){
+                ordenActual=ordenActual+1;
+                h=h.getHermanoDerecho();
+            }
+        }
+        if(ordenActual>ordenMayor){
+            ordenMax=ordenActual;
+        }
+        orden=ordenLiamAux(n.getHijoIzquierdo(),0,ordenMax);
+        if(n.getHijoIzquierdo()!=null){
+        NodoGen h=n.getHijoIzquierdo().getHermanoDerecho();
+        while(h!=null){
+            orden=ordenLiamAux(h,0,ordenMax);
+            h=h.getHermanoDerecho();
+        }
+        }
+    }
+        return orden;
+    }
+    
     //SIMULACRO
     /* public boolean verificarCamino(Lista l1) {
         boolean exito = false;
